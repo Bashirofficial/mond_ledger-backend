@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "module": "nodenext",
+    "esModuleInterop": true,
+    "target": "ES2020",
+    "lib": ["ES2020"],
+    "allowJs": false,
+    "strict": true,
+    "strictNullChecks": true,
+    //"noImplicitAny": true,
+    "moduleResolution": "nodenext",
+    "resolveJsonModule": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "removeComments": true,
+    "allowImportingTsExtensions": false,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "typeRoots": ["./src/types", "./node_modules/@types"],
+    "types": ["node", "express"],
+  },
+  "include": [
+    "src/**/*",
+    "src/types/**/*",
+    "src/**/*.d.ts",
+    "src/types/*.d.ts",
+    "tests/**/*"
+  ],
+  "exclude": ["dist", "node_modules", ".templates"]
+}
