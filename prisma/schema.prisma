@@ -4,7 +4,8 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client" 
+  provider = "prisma-client"
+  output   = "../src/generated/client"
 }
 
 datasource db {
@@ -13,9 +14,9 @@ datasource db {
 
 
 enum Role {
-  VIEWER    
-  ANALYST   
-  ADMIN    
+  VIEWER
+  ANALYST
+  ADMIN
 }
 
 enum TransactionType {
@@ -23,14 +24,105 @@ enum TransactionType {
   EXPENSE
 }
 
-enum UserStatus {
-  ACTIVE
-  INACTIVE
-}
-
 enum AuditAction {
   CREATE
   UPDATE
   DELETE
   ROLE_CHANGE
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  firstName     String?
+  lastName      String?
+  password      String
+  role          Role           @default(VIEWER)
+  isActive      Boolean        @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactions   Transaction[]
+  refreshTokens  RefreshToken[]
+  auditLogs      AuditLog[]   @relation("AuditPerformedBy")
+
+  @@map("users")
+}
+
+model Category {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactions Transaction[]
+
+  @@map("categories")
+}
+
+model Transaction {
+  id          String          @id @default(uuid())
+  amount      Decimal         @db.Decimal(12, 2)
+  type        TransactionType
+  description String?
+  date        DateTime        @db.Date
+  notes       String?
+
+
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+
+  userId     String
+  categoryId String
+  user       User     @relation(fields: [userId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+
+
+  @@index([date])
+  @@index([type])
+  @@index([userId])
+  @@index([categoryId])
+  @@index([deletedAt])
+  @@map("transactions")
+}
+
+model AuditLog {
+  id         String      @id @default(uuid())
+  action     AuditAction
+  entity     String
+  entityId   String
+  beforeData Json?
+  afterData  Json?
+  ipAddress  String?
+  userAgent  String?
+
+  createdAt DateTime @default(now())
+
+  performedById String
+  performedBy   User   @relation("AuditPerformedBy", fields: [performedById], references: [id])
+
+  @@index([entity, entityId])
+  @@index([performedById])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model RefreshToken {
+  id            String        @id @default(uuid())
+  token         String        @unique
+  userId        String
+  expiresAt     DateTime
+  createdAt     DateTime      @default(now())
+
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@map("refresh_tokens")
 }
