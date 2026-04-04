@@ -1,4 +1,5 @@
 import { Request } from "express";
+import { Role } from "../generated/client/enums";
 
 // Extend Express Request to include authenticated user
 declare global {
@@ -7,7 +8,7 @@ declare global {
       user?: {
         id: string;
         email: string;
-        role: "VIEWER" | "ADMIN" | "ANALYST" ;
+        role:  Role;
          
       };
     }
