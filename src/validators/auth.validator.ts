@@ -1,36 +1,28 @@
 import { z } from "zod";
 
-const required = (name: string) => ({
-  error: (issue: any) =>
-    issue.input === undefined
-      ? `${name} is required`
-      : `Invalid ${name.toLowerCase()}`,
-});
-
+// ---------- REGISTER ----------
 export const registerSchema = z.object({
-  body: z.object({
-    email: z.email(required("Email")),
-    password: z
-      .string(required("Password"))
-      .min(8, "Password must be at least 8 characters")
-      .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-        "Password must contain at least one uppercase letter, one lowercase letter, and one number",
-      ),
-    firstName: z.string().optional(),
-    lastName: z.string().optional(),
-  }),
+  email: z.string().email("Invalid email"),
+
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+      "Password must contain uppercase, lowercase, and number",
+    ),
+
+  firstName: z.string().min(2).max(50).optional(),
+  lastName: z.string().min(2).max(50).optional(),
 });
 
+// ---------- LOGIN ----------
 export const loginSchema = z.object({
-  body: z.object({
-    email: z.email(required("Email")),
-    password: z.string(required("Password")),
-  }),
+  email: z.string().email("Invalid email"),
+  password: z.string().min(1, "Password is required"),
 });
 
+// ---------- REFRESH TOKEN ----------
 export const refreshSchema = z.object({
-  body: z.object({
-    refreshToken: z.string(required("Refresh token")),
-  }),
+  refreshToken: z.string().min(1, "Refresh token is required"),
 });
