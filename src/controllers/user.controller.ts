@@ -11,15 +11,45 @@ const register = AsyncHandler(async (req: Request, res: Response) => {
     userAgent: req.get("user-agent"),
   });
 
-  return res
-    .status(201)
-    .json(new ApiResponse(201, data, "User registered successfully"));
+  return res.status(201).json(
+    new ApiResponse(
+      201,
+      {
+        user: {
+          id: data.user.id,
+          email: data.user.email,
+          role: data.user.role,
+        },
+        tokens: {
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+        },
+      },
+      "User registered successfully",
+    ),
+  );
 });
 
 const login = AsyncHandler(async (req: Request, res: Response) => {
   const data = await userService.login(req.body.email, req.body.password);
 
-  return res.json(new ApiResponse(200, data, "Login successful"));
+  return res.json(
+    new ApiResponse(
+      200,
+      {
+        user: {
+          id: data.user.id,
+          email: data.user.email,
+          role: data.user.role,
+        },
+        tokens: {
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+        },
+      },
+      "Login successful",
+    ),
+  );
 });
 
 const logout = AsyncHandler(async (req: Request, res: Response) => {

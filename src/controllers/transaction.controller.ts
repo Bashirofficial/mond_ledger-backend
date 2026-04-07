@@ -40,6 +40,10 @@ const updateTransaction = AsyncHandler(async (req: Request, res: Response) => {
     transactionId,
     req.body,
     user,
+    {
+      ip: req.ip,
+      userAgent: req.get("user-agent"),
+    },
   );
 
   return res
@@ -56,12 +60,20 @@ const updateTransaction = AsyncHandler(async (req: Request, res: Response) => {
 const deleteTransaction = AsyncHandler(async (req: Request, res: Response) => {
   const user = getUser(req);
   const transactionId = req.params.id as string;
-
-  await txService.deleteTransaction(transactionId, user);
+  const updated = await txService.deleteTransaction(transactionId, user, {
+    ip: req.ip,
+    userAgent: req.get("user-agent"),
+  });
 
   return res
     .status(200)
-    .json(new ApiResponse(200, null, "Transaction deleted successfully"));
+    .json(
+      new ApiResponse(
+        200,
+        { transaction: updated },
+        "Transaction deleted successfully",
+      ),
+    );
 });
 
 const getDashboardData = AsyncHandler(async (req: Request, res: Response) => {
