@@ -1,4 +1,4 @@
-import { serializeBigInt } from "./serialization.util";
+import { serializeBigInt } from "./serialization.util.js";
 class ApiResponse<T = any> {
   public statusCode: number;
   public data: T;
