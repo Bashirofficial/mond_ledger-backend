@@ -1,5 +1,5 @@
 import { rateLimit as baseRateLimit, Options } from "express-rate-limit";
-import { ApiError } from "../utils/ApiError";
+import { ApiError } from "../utils/ApiError.js";
 
 // Rate limiter middleware which allow 100 requests per 15 minutes
 export const createRateLimiter = (options?: Partial<Options>) => {
@@ -16,7 +16,7 @@ export const createRateLimiter = (options?: Partial<Options>) => {
         - End of Window A: A user sends 100 requests in the last 10 seconds of the window.
         - Window Resets: The clock hits the 15-minute mark, and the counter drops to 0.
         - Start of Window B: The same user sends another 100 requests in the first 10 seconds of the new window.
-        - Result: The user successfully sent 200 requests in 20 seconds, even though your "limit" is 100 per 15 minutes. 
+        - Result: The user successfully sent 200 requests in 20 seconds, even though your "limit" is 100 per 15 minutes.
     */
     keyGenerator: (req) => {
       const xRealIp = req.get("x-real-ip");
