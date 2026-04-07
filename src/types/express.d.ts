@@ -8,8 +8,8 @@ declare global {
       user?: {
         id: string;
         email: string;
-        role:  Role;
-         
+        role: Role;
+        isActive: boolean;
       };
     }
   }
