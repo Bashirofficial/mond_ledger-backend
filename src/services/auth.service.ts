@@ -1,10 +1,10 @@
-import prisma from "../db";
+import prisma from "../db/index.js";
 import {
   generateAccessToken,
   generateRefreshToken,
   verifyRefreshToken,
-} from "../utils/jwt.util";
-import { ApiError } from "../utils/ApiError";
+} from "../utils/jwt.util.js";
+import { ApiError } from "../utils/ApiError.js";
 
 const getRefreshTokenExpiry = () =>
   new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
