@@ -2,9 +2,12 @@ import express, { Application } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
- 
+import {
+  errorHandler,
+  notFoundHandler,
+} from "./middlewares/errorHandler.middleware.js";
 
-const app: Application = express(); 
+const app: Application = express();
 
 // ================= Security =================
 app.use(helmet());
@@ -36,7 +39,16 @@ app.get("/health", (req, res) => {
 });
 
 // ================= Routes =================
- 
-// ================= Error Handling ================= 
+import userRoutes from "./routes/user.route.js";
+import categoryRoutes from "./routes/category.route.js";
+import transactionRoutes from "./routes/transaction.route.js";
+
+app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/categories", categoryRoutes);
+app.use("/api/v1/transactions", transactionRoutes);
+
+// ================= Error Handling =================
+app.use(notFoundHandler); // 404 handler - must be after all routes
+app.use(errorHandler); // Global error handler - must be after all routes
 
 export default app;
