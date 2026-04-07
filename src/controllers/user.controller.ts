@@ -1,37 +1,86 @@
 import { Request, Response } from "express";
-import { comparePassword, hashPassword } from "../utils/hash.util";
-import prisma from "../db";
-import { ApiError } from "../utils/ApiError";
-import { ApiResponse } from "../utils/ApiResponse";
-import { AsyncHandler } from "../utils/AsyncHandler";
-import {
-  generateAccessAndRefreshToken,
-  rotateRefreshToken,
-  revokeRefreshToken,
-} from "../services/auth.service";
-import { success } from "zod";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { AsyncHandler } from "../utils/AsyncHandler.js";
+import userService from "../services/user.service.js";
 
-//--------- Controllers (C) ---------//
+// -------- Controller Methods --------
 
-// C1. Refresh Access Token using refreshToken
-const refreshAccessToken = AsyncHandler(async (req: Request, res: Response) => {
-  const { refreshToken } = req.body;
+const register = AsyncHandler(async (req: Request, res: Response) => {
+  const data = await userService.register(req.body, {
+    ip: req.ip,
+    userAgent: req.get("user-agent"),
+  });
 
-  if (!refreshToken) {
-    throw new ApiError(401, "Refresh token is required");
-  }
-
-  try {
-    const tokens = await rotateRefreshToken(refreshToken);
-
-    
-    return res
-      .status(200)
-      .json(new ApiResponse(200, tokens, "Tokens refreshed successfully"));
-  } catch (error) {
-    console.error("Error refreshing tokens:", error);
-    throw error;
-  }
+  return res
+    .status(201)
+    .json(new ApiResponse(201, data, "User registered successfully"));
 });
 
-// C2. User Registration 
+const login = AsyncHandler(async (req: Request, res: Response) => {
+  const data = await userService.login(req.body.email, req.body.password);
+
+  return res.json(new ApiResponse(200, data, "Login successful"));
+});
+
+const logout = AsyncHandler(async (req: Request, res: Response) => {
+  await userService.logout(req.body.refreshToken);
+
+  return res.json(new ApiResponse(200, {}, "Logout successful"));
+});
+
+const getUser = AsyncHandler(async (req: Request, res: Response) => {
+  const userId = req.params.id as string;
+  const user = await userService.getUserById(userId);
+
+  return res.json(new ApiResponse(200, { user }, "User fetched successfully"));
+});
+
+const assignRole = AsyncHandler(async (req: Request, res: Response) => {
+  const userId = req.params.id as string;
+
+  const updated = await userService.assignRole(
+    userId,
+    req.body.role,
+    req.user!,
+    {
+      ip: req.ip,
+      userAgent: req.get("user-agent"),
+    },
+  );
+
+  return res.json(
+    new ApiResponse(200, { updated }, "Role updated successfully"),
+  );
+});
+
+const deactivateUser = AsyncHandler(async (req: Request, res: Response) => {
+  const userId = req.params.id as string;
+  await userService.deactivateUser(userId, req.user!, {
+    ip: req.ip,
+    userAgent: req.get("user-agent"),
+  });
+
+  return res.json(new ApiResponse(200, {}, "User deactivated successfully"));
+});
+
+const deleteUser = AsyncHandler(async (req: Request, res: Response) => {
+  const userId = req.params.id as string;
+  const updated = await userService.deleteUser(userId, req.user!, {
+    ip: req.ip,
+    userAgent: req.get("user-agent"),
+  });
+
+  return res.json(
+    new ApiResponse(200, { updated }, "User deleted successfully"),
+  );
+});
+
+export {
+  register,
+  login,
+  logout,
+  getUser,
+  assignRole,
+  deactivateUser,
+  deleteUser,
+};
