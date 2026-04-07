@@ -26,6 +26,8 @@ async function main() {
 
   // 2. Users
   const password = await bcrypt.hash("Password@123", 10);
+
+  // --- Create Admin ---
   const admin = await prisma.user.upsert({
     where: { email: "admin@test.com" },
     update: {},
@@ -38,7 +40,33 @@ async function main() {
     },
   });
 
-  // 3. Transactions
+  // --- Create Analyst ---
+  const analyst = await prisma.user.upsert({
+    where: { email: "analyst@test.com" },
+    update: {},
+    create: {
+      email: "analyst@test.com",
+      firstName: "Anna",
+      lastName: "Analyst",
+      password,
+      role: Role.ANALYST,
+    },
+  });
+
+  // --- Create Viewer ---
+  const viewer = await prisma.user.upsert({
+    where: { email: "viewer@test.com" },
+    update: {},
+    create: {
+      email: "viewer@test.com",
+      firstName: "Victor",
+      lastName: "Viewer",
+      password,
+      role: Role.VIEWER,
+    },
+  });
+
+  // 3.Transactions
   await prisma.transaction.create({
     data: {
       amount: 50000,
@@ -50,20 +78,20 @@ async function main() {
     },
   });
 
+  // Analyst recording an expense
   await prisma.transaction.create({
     data: {
       amount: 1500,
       type: TransactionType.EXPENSE,
       categoryId: foodCat.id,
-      userId: admin.id,
+      userId: analyst.id,
       date: new Date(),
-      description: "Groceries",
+      description: "Business Lunch",
     },
   });
 
   console.log("✅ Seed complete");
 }
-
 main()
   .catch((e) => {
     console.error(e);
