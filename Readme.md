@@ -18,7 +18,9 @@ A backend system for managing financial transactions with role-based access cont
 
 The project follows a layered architecture:
 
-Routes → Controllers → Services → Repositories → Database
+```bash
+🌐 Routes → 🎮 Controllers → ⚙️ Services → 📦 Repositories → 🗄️ Database
+```
 
 - **Controllers**: Handle HTTP requests/responses
 - **Services**: Business logic & rules
@@ -49,7 +51,7 @@ Middleware:
 
 - Register / Login / Logout
 - Role assignment (Admin only)
-- Activate / Deactivate users
+- Activate / Deactivate users (Admin only)
 
 ---
 
@@ -88,28 +90,29 @@ Tracks:
 
 ## 📦 API Endpoints
 
-### Auth
-
-- `POST /auth/register`
-- `POST /auth/login`
-- `POST /auth/logout`
-
 ### Users (Admin)
 
-- `GET /users`
-- `PATCH /users/:id/role`
-- `PATCH /users/:id/status`
+- `POST /users/register`
+- `POST /users/login`
+- `POST /users/logout`
+- `GET /users/:id`
+- `DELETE /users/:id`
+- `PATCH /users/:id/deactivate`
+- `PATCH /users/:id/assign-role`
 
 ### Transactions
 
 - `POST /transactions`
 - `GET /transactions`
+- `PATCH /transactions/:id`
 - `DELETE /transactions/:id`
+- `GET /transactions/dashboard`
 
 ### Categories
 
 - `GET /categories`
 - `POST /categories`
+- `GET /categories/:id`
 
 ---
 
@@ -172,7 +175,7 @@ Tracks:
 
 ### 7. Simplified Refresh Token Model
 
-- Easy to implement and reason about
+- Easy to implement and organize
 - Tradeoff: Does not include advanced rotation logic
 
 ---
@@ -180,7 +183,10 @@ Tracks:
 ## ⚠️ Limitations
 
 - No advanced token rotation (can be extended)
-- In-memory rate limiting (not distributed)
+- Rate limiting is not distributed (no Redis)
+- Limited optimization on aggregation queries
+- No automated tests due to time constraints (unit/integration)
+- No caching layer implemented
 - No full test coverage (due to time constraints)
 
 ---
