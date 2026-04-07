@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "description": "Finance Data Processing and Access Control Backend Application",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node dist/index.js",
     "dev": "tsc-watch --onSuccess \"node dist/index.js\"",
-    "build": "prisma generate && tsc"
+    "build": "prisma generate && tsc",
+    "seed": "tsx prisma/seed.ts"
   },
   "author": "Bashir Ahmed Mondal",
   "license": "ISC",
