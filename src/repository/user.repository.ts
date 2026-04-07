@@ -1,5 +1,5 @@
-import prisma from "../db";
-import { Role } from "../generated/client/enums";
+import prisma from "../db/index.js";
+import { Role } from "../generated/client/enums.js";
 
 class UserRepository {
   findUniqueByEmail(email: string) {
