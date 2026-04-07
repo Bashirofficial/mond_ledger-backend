@@ -1,6 +1,7 @@
 import txRepo from "../repository/transaction.repository.js";
 import { ApiError } from "../utils/ApiError.js";
-import { Role } from "../generated/client/enums.js";
+import auditRepo from "../repository/auditLog.repository.js";
+import { Role, AuditAction } from "../generated/client/enums.js";
 
 class TransactionService {
   // --------  CREATE TRANSACTIONS --------
@@ -17,6 +18,7 @@ class TransactionService {
     id: string,
     data: any,
     user: { id: string; role: Role },
+    meta: any,
   ) {
     const existing = await txRepo.findById(id);
     if (!existing) {
@@ -27,11 +29,28 @@ class TransactionService {
       throw new ApiError(403, "Only admins can update this transaction");
     }
 
-    return txRepo.update(id, data);
+    const updated = await txRepo.update(id, data);
+
+    await auditRepo.create({
+      action: AuditAction.UPDATE,
+      entity: "Transaction",
+      entityId: id,
+      performedById: user.id,
+      beforeData: existing,
+      afterData: updated,
+      ipAddress: meta.ip,
+      userAgent: meta.userAgent,
+    });
+
+    return updated;
   }
 
   // -------- DELETE TRANSACTIONS (SOFT DELETE) --------
-  async deleteTransaction(id: string, user: { id: string; role: Role }) {
+  async deleteTransaction(
+    id: string,
+    user: { id: string; role: Role },
+    meta: any,
+  ) {
     const existing = await txRepo.findById(id);
     if (!existing) {
       throw new ApiError(404, "Transaction not found");
@@ -40,7 +59,21 @@ class TransactionService {
     if (user.role !== Role.ADMIN) {
       throw new ApiError(403, "Only admins can delete this transaction");
     }
-    return txRepo.softDelete(id);
+
+    const updated = await txRepo.softDelete(id);
+
+    await auditRepo.create({
+      action: AuditAction.DELETE,
+      entity: "Transaction",
+      entityId: id,
+      performedById: user.id,
+      beforeData: existing,
+      afterData: updated,
+      ipAddress: meta.ip,
+      userAgent: meta.userAgent,
+    });
+
+    return updated;
   }
 
   // -------- GET TRANSACTIONS WITH FILTERS & PAGINATION --------
