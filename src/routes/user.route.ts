@@ -10,7 +10,7 @@ import {
 } from "../controllers/user.controller.js";
 
 import { authenticate } from "../middlewares/auth.middleware.js";
-import { requireRole } from "../middlewares/rbac.middleware.js";
+import { requireRole, requireMinRole } from "../middlewares/rbac.middleware.js";
 import { validateRequest } from "../middlewares/validateRequest.middleware.js";
 import { Role } from "../generated/client/enums.js";
 import {
@@ -30,7 +30,7 @@ router
 
 router
   .route("/:id")
-  .get(authenticate, getUser)
+  .get(authenticate, requireMinRole(Role.ANALYST), getUser)
   .delete(authenticate, requireRole(Role.ADMIN), deleteUser);
 
 router

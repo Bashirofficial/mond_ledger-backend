@@ -8,7 +8,7 @@ import {
 } from "../controllers/transaction.controller.js";
 
 import { authenticate } from "../middlewares/auth.middleware.js";
-import { requireRole } from "../middlewares/rbac.middleware.js";
+import { requireMinRole, requireRole } from "../middlewares/rbac.middleware.js";
 import { validateRequest } from "../middlewares/validateRequest.middleware.js";
 import { Role } from "../generated/client/enums.js";
 import {
@@ -23,11 +23,15 @@ router.use(authenticate);
 router
   .route("/")
   .post(
-    requireRole(Role.ADMIN),
+    requireMinRole(Role.ADMIN),
     validateRequest(createTransactionSchema),
     createTransaction,
   )
-  .get(validateRequest(transactionFilterSchema, "query"), getTransactions);
+  .get(
+    requireMinRole(Role.ADMIN),
+    validateRequest(transactionFilterSchema, "query"),
+    getTransactions,
+  );
 
 router
   .route("/:id")
@@ -38,8 +42,6 @@ router
   )
   .delete(requireRole(Role.ADMIN), deleteTransaction);
 
-router
-  .route("/dashboard")
-  .get(requireRole(Role.ADMIN, Role.ANALYST), getDashboardData);
+router.route("/dashboard").get(requireMinRole(Role.VIEWER), getDashboardData);
 
 export default router;
