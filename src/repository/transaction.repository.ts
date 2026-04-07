@@ -1,5 +1,5 @@
-import prisma from "../db";
-import { TransactionType } from "../generated/client/enums";
+import prisma from "../db/index.js";
+import { TransactionType } from "../generated/client/enums.js";
 
 export interface TransactionFilters {
   userId: string;
@@ -12,6 +12,16 @@ export interface TransactionFilters {
 class TransactionRepository {
   create(data: any) {
     return prisma.transaction.create({ data });
+  }
+
+  findById(id: string) {
+    // findUnique ignores the deletedAt filter, so I have used findFirst  to ensure we don't return soft-deleted transactions.
+    return prisma.transaction.findFirst({
+      where: {
+        id,
+        deletedAt: null,
+      },
+    });
   }
 
   update(id: string, data: any) {
