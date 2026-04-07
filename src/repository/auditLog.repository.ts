@@ -1,5 +1,5 @@
-import prisma from "../db";
-import { AuditAction, Prisma } from "../generated/client/client";
+import prisma from "../db/index.js";
+import { AuditAction, Prisma } from "../generated/client/client.js";
 
 export interface AuditLogEntry {
   action: AuditAction;
