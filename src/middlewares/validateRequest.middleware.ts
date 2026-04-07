@@ -11,7 +11,7 @@ export const validateRequest = (
     try {
       const validated = await schema.parseAsync(req[source]);
 
-      req[source] = validated;
+      Object.assign(req[source], validated);
 
       next();
     } catch (error) {
