@@ -19,11 +19,14 @@ import {
   logoutSchema,
   assignRoleSchema,
 } from "../validators/user.validator.js";
+import { userRateLimit } from "../middlewares/rateLimit.middleware.js";
 
 const router = Router();
 
-router.route("/register").post(validateRequest(registerSchema), register);
-router.route("/login").post(validateRequest(loginSchema), login);
+router
+  .route("/register")
+  .post(userRateLimit, validateRequest(registerSchema), register);
+router.route("/login").post(userRateLimit, validateRequest(loginSchema), login);
 router
   .route("/logout")
   .post(authenticate, validateRequest(logoutSchema), logout);
