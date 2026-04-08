@@ -8,16 +8,8 @@ export const createRateLimiter = (options?: Partial<Options>) => {
     limit: 100, // Note: 'max' is deprecated in newer versions for 'limit'
     standardHeaders: true,
     legacyHeaders: false,
-    validate: { xForwardedForHeader: false, keyGeneratorIpFallback: false }, //This will stop the validation error on local/vercel
-    /**
-     * Temporarily for vercel - real user IP from Vercel's header is being fetched
-     * #TODO: Use Redis rate limit to over come the below limitation
-     * Current Limitation
-        - End of Window A: A user sends 100 requests in the last 10 seconds of the window.
-        - Window Resets: The clock hits the 15-minute mark, and the counter drops to 0.
-        - Start of Window B: The same user sends another 100 requests in the first 10 seconds of the new window.
-        - Result: The user successfully sent 200 requests in 20 seconds, even though your "limit" is 100 per 15 minutes.
-    */
+    validate: { xForwardedForHeader: false, keyGeneratorIpFallback: false },
+
     keyGenerator: (req) => {
       const xRealIp = req.get("x-real-ip");
       const xForwardedFor = req.get("x-forwarded-for");
