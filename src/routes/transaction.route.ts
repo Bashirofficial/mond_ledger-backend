@@ -16,6 +16,7 @@ import {
   transactionFilterSchema,
   updateTransactionSchema,
 } from "../validators/transaction.validator.js";
+import { userRateLimit } from "../middlewares/rateLimit.middleware.js";
 
 const router = Router();
 router.use(authenticate);
@@ -23,11 +24,13 @@ router.use(authenticate);
 router
   .route("/")
   .post(
+    userRateLimit,
     requireMinRole(Role.ADMIN),
     validateRequest(createTransactionSchema),
     createTransaction,
   )
   .get(
+    userRateLimit,
     requireMinRole(Role.ADMIN),
     validateRequest(transactionFilterSchema, "query"),
     getTransactions,
@@ -36,6 +39,7 @@ router
 router
   .route("/:id")
   .patch(
+    userRateLimit,
     requireRole(Role.ADMIN),
     validateRequest(updateTransactionSchema),
     updateTransaction,
