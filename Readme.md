@@ -3,6 +3,12 @@
 A backend system for managing financial transactions with role-based access control, audit logging, and analytics support.
 
 ---
+## 📌 POSTMAN API DOCUMENT 
+
+```bash
+https://drive.google.com/drive/folders/1Xazc5b2C7HgZXMRGUPznH5y-oc-tn4rL?usp=sharing
+```
+---
 
 ## 🚀 Tech Stack
 
